@@ -1,0 +1,19 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@types/node": "^14.0.26",
+    "async": "2.4.1",
+    "es6-promise": "^4.2.8",
+    "javascript-state-machine": "^2.4.0",
+    "jszip": "^3.6.0",
+    "jszip-utils": "^0.1.0",
+    "lodash": "^4.17.11",
+    "npm": "^7.6.1"
+  },
+  "scripts": {},
+  "author": "",
+  "license": "ISC"
+}

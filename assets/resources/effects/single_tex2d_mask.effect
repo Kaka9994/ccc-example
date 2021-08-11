@@ -1,0 +1,196 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
+
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+        nodeRatio: { value: 1.0, editor: { tooltip: "节点宽高比" } }
+        trimRatio: { value: [1.0, 1.0], editor: { tooltip: "裁剪后于裁剪前的比例(w, h)" }}
+        maskType: { value: 0.0, editor: { tooltip: "遮罩类型" } }
+        centerPoint: { value: [0.5, 0.5], editor: { tooltip: "遮罩中点" } }
+        rectSize: { value: [1.0, 1.0], editor: { tooltip: "矩形遮罩尺寸" } }
+        circleR: { value: 0.5, editor: { tooltip: "圆形遮罩半径" } }
+        imageTexture: { value: white, editor: { tooltip: "图片遮罩纹理" } }
+        imageRatio: { value: 1.0, editor: { tooltip: "图片遮罩宽高比" } }
+}%
+
+
+CCProgram vs %{
+  precision highp float;
+
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
+
+  #if USE_TEXTURE
+  in vec2 a_uv0;
+  out vec2 v_uv0;
+  #endif
+
+  void main () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
+
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;
+    #endif
+
+    v_color = a_color;
+
+    gl_Position = pos;
+  }
+}%
+
+
+CCProgram fs %{
+  precision highp float;
+  
+  #include <alpha-test>
+
+  in vec4 v_color;
+
+  #if USE_TEXTURE
+  in vec2 v_uv0;
+  uniform sampler2D texture;
+  #endif
+
+  uniform sampler2D imageTexture;
+
+  uniform maskProps {
+    vec2 trimRatio;
+    vec2 centerPoint;
+    vec2 rectSize;
+    float nodeRatio;
+    float circleR;
+    float maskType;
+    float imageRatio;
+  };
+
+  void doRect (inout vec4 o) {
+    // trim修正
+    float haflw = rectSize.x / 2.0 * trimRatio.x;
+    float haflh = rectSize.y / 2.0 * trimRatio.y;
+
+    if (abs(v_uv0.x - centerPoint.x) > haflw ||
+        abs(v_uv0.y - centerPoint.y) > haflh) {
+      o.a = 0.0;
+    }
+  }
+
+  void doCircle (inout vec4 o) {
+    vec2 imgUV = vec2(v_uv0);
+
+    // trim修正
+    imgUV.x = (imgUV.x / trimRatio.x) - (0.5 / trimRatio.x - 0.5);
+    imgUV.y = (imgUV.y / trimRatio.y) - (0.5 / trimRatio.y - 0.5);
+
+    // 节点尺寸修正
+    if (nodeRatio > 1.0) {
+      imgUV.x *= nodeRatio;
+      float dx = 0.5 * (nodeRatio - 1.0) * (1.0 / nodeRatio);
+      imgUV.x -= dx;
+    } else {
+      imgUV.y /= nodeRatio;
+      float dy = 0.5 * (nodeRatio - 1.0) * (1.0 / nodeRatio);
+      imgUV.y += dy;
+    }
+
+    if (length(imgUV - centerPoint) > circleR) {
+      o.a = 0.0;
+    }
+  }
+  
+  void doImageStencil (inout vec4 o) {
+    vec2 imgUV = vec2(v_uv0);
+
+    // trim修正
+    imgUV.x = (imgUV.x / trimRatio.x) - (0.5 / trimRatio.x - 0.5);
+    imgUV.y = (imgUV.y / trimRatio.y) - (0.5 / trimRatio.y - 0.5);
+
+    // 节点尺寸修正
+    if (nodeRatio > 1.0) {
+      imgUV.x *= nodeRatio;
+      float dx = 0.5 * (nodeRatio - 1.0) * (1.0 / nodeRatio);
+      imgUV.x -= dx;
+    } else {
+      imgUV.y /= nodeRatio;
+      float dy = 0.5 * (nodeRatio - 1.0) * (1.0 / nodeRatio);
+      imgUV.y += dy;
+    }
+
+    // 目标纹理尺寸修正
+    if (imageRatio > 1.0) {
+      imgUV.x /= imageRatio;
+      float dx = 0.5 * (imageRatio - 1.0) * (1.0 / imageRatio);
+      imgUV.x += dx;
+    } else {
+      imgUV.y *= imageRatio;
+      float dy = 0.5 * (imageRatio - 1.0) * (1.0 / imageRatio);
+      imgUV.y -= dy;
+    }
+
+    // 缩放修正
+    float ratio = 1.0;
+    if (imageRatio > 1.0) {
+      ratio = nodeRatio;
+    }
+    imgUV.x /= ratio;
+    float dxx = 0.5 * (ratio - 1.0) * (1.0 / ratio);
+    imgUV.x += dxx;
+    imgUV.y /= ratio;
+    float dyy = 0.5 * (ratio - 1.0) * (1.0 / ratio);
+    imgUV.y += dyy;
+
+    if (imgUV.x > 1.0 || imgUV.x < 0.0 ||
+        imgUV.y > 1.0 || imgUV.y < 0.0) {
+      o.a = 0.0;
+    } else {
+      o.a *= texture(imageTexture, imgUV).a;
+    }
+  }
+
+  void main () {
+    vec4 o = vec4(1, 1, 1, 1);
+
+    #if USE_TEXTURE
+    o *= texture(texture, v_uv0);
+
+    if (maskType == 0.0) {
+      doRect(o);
+    } 
+    else if (maskType == 1.0) {
+      doCircle(o);
+    }
+    else {
+      doImageStencil(o);
+    }
+
+      #if CC_USE_ALPHA_ATLAS_TEXTURE
+      o.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+      #endif
+    #endif
+
+    o *= v_color;
+
+    ALPHA_TEST(o);
+
+    gl_FragColor = o;
+  }
+}%

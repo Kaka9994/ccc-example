@@ -1,0 +1,27 @@
+
+Guide_S01.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+O1
+  rotate: false
+  xy: 2, 396
+  size: 541, 541
+  orig: 541, 541
+  offset: 0, 0
+  index: -1
+fangkuai
+  rotate: false
+  xy: 545, 877
+  size: 60, 60
+  orig: 60, 60
+  offset: 0, 0
+  index: -1
+hand
+  rotate: false
+  xy: 2, 2
+  size: 410, 392
+  orig: 410, 392
+  offset: 0, 0
+  index: -1

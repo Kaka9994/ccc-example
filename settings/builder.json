@@ -1,0 +1,63 @@
+{
+  "title": "Test1",
+  "packageName": "",
+  "startScene": "23228596-6039-4a3a-a813-88223d5d645d",
+  "excludeScenes": [
+    "d2df10ac-6686-4013-a8b0-5ea70a4ed0b3",
+    "f36834d0-6492-4f4e-8d97-0209c3b54846",
+    "cf507fd9-2ffd-4b3d-80b6-22fb36a5c086",
+    "d4d69fa9-db6a-4bd8-a3f1-081e52f33ca0",
+    "82c49c67-41c5-466a-bf1d-a85f706a99e6"
+  ],
+  "includeSDKBox": false,
+  "orientation": {
+    "landscapeLeft": true,
+    "landscapeRight": true,
+    "portrait": false,
+    "upsideDown": false
+  },
+  "webOrientation": "auto",
+  "inlineSpriteFrames": true,
+  "inlineSpriteFrames_native": true,
+  "mergeStartScene": false,
+  "optimizeHotUpdate": false,
+  "md5Cache": false,
+  "encryptJs": true,
+  "xxteaKey": "1f27efca-53b8-43",
+  "zipCompressJs": true,
+  "fb-instant-games": {},
+  "android": {
+    "packageName": "",
+    "REMOTE_SERVER_ROOT": ""
+  },
+  "ios": {
+    "packageName": "kaka",
+    "REMOTE_SERVER_ROOT": "",
+    "ios_enable_jit": true
+  },
+  "mac": {
+    "packageName": "",
+    "REMOTE_SERVER_ROOT": "",
+    "width": 1280,
+    "height": 720
+  },
+  "win32": {
+    "REMOTE_SERVER_ROOT": "",
+    "width": 1280,
+    "height": 720
+  },
+  "android-instant": {
+    "REMOTE_SERVER_ROOT": "",
+    "host": "",
+    "packageName": "",
+    "pathPattern": "",
+    "recordPath": "",
+    "scheme": "https",
+    "skipRecord": false
+  },
+  "appBundle": false,
+  "mainCompressionType": "default",
+  "mainIsRemote": false,
+  "nativeMd5Cache": false,
+  "agreements": {}
+}

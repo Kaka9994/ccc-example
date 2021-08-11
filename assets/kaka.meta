@@ -1,0 +1,20 @@
+{
+  "ver": "1.1.2",
+  "uuid": "a83284c5-5e8f-434c-b850-e329546760e4",
+  "isBundle": true,
+  "bundleName": "kaka",
+  "priority": 1,
+  "compressionType": {
+    "ios": "default"
+  },
+  "optimizeHotUpdate": {
+    "ios": false
+  },
+  "inlineSpriteFrames": {
+    "ios": false
+  },
+  "isRemoteBundle": {
+    "ios": false
+  },
+  "subMetas": {}
+}

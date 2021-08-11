@@ -1,0 +1,18 @@
+{
+	"game": {
+		"name": "测试",
+		"appid": "673010986",
+		"cid": "0"
+	},
+	"configs": [
+		{
+			"appid": "673010986",
+			"services": [
+				{
+					"service_id": "242",
+					"enable": false
+				}
+			]
+		}
+	]
+}

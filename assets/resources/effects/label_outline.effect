@@ -1,0 +1,138 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
+
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+        u_font_size: { value: 0.0, editor: { tooltip: "文字尺寸" } }
+        u_line_width: { value: 0.0, editor: { tooltip: "描边宽度" } }
+        u_line_color: { value: [1.0, 1.0, 1.0, 1.0], editor: { "type":"color", tooltip: "描边颜色" } }
+}%
+
+
+CCProgram vs %{
+  precision highp float;
+
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
+
+  #if USE_TEXTURE
+  in vec2 a_uv0;
+  out vec2 v_uv0;
+  #endif
+
+  void main () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
+
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;
+    #endif
+
+    v_color = a_color;
+
+    gl_Position = pos;
+  }
+}%
+
+
+CCProgram fs %{
+  precision highp float;
+  
+  #include <alpha-test>
+
+  in vec4 v_color;
+
+  #if USE_TEXTURE
+  in vec2 v_uv0;
+  uniform sampler2D texture;
+  #endif
+
+  uniform maskProps {
+    vec4 u_line_color;
+    float u_font_size;
+    float u_line_width;
+  };
+
+  // 获取这个角度上距离line的点的透明度
+  float getAlphaWithAngle(float angle) {
+    float line = u_line_width / u_font_size;
+    vec2 p = vec2(cos(degrees(angle)), sin(degrees(angle))) * line;
+    float a = texture(texture, v_uv0 + p).a;
+    return a;
+  }
+
+  // 判断这个角度上距离line的点是否是透明
+  int getIsStrokeWithAngle(float angle) {
+    int stroke = 0;
+    float a = getAlphaWithAngle(angle);
+    if (a >= 0.5) {
+      stroke = 1;
+    }
+    return stroke;
+  }
+
+  void main () {
+    vec4 o = vec4(1, 1, 1, 1);
+
+    #if USE_TEXTURE
+    o *= texture(texture, v_uv0);
+
+    // // 锐化参数
+    // float sharpening = 36.0;
+    // // 透明度阀值
+    // float alphaThreshold = 0.5;
+    // // 计算周围点的透明度
+    // const float rad = 10.0;
+    // float alpha = o.a;
+    // for (float i = 0.0; i < 360.0; i += rad) {
+    //   alpha += getAlphaWithAngle(i) * (2.0 - cos(degrees(i)));
+    // }
+
+    // vec4 outlineColor = u_line_color;
+    // if (alpha > alphaThreshold) {
+    //   outlineColor.a = alpha / sharpening;
+    //   o = (outlineColor * (1.0 - o.a)) + (o * o.a);
+    // }
+
+    if (o.a < 0.5) {
+      int strokeCount = 0;
+      for (int i = 0; i < 12; i++) {
+        strokeCount += getIsStrokeWithAngle(float(i) * 30.0);
+      }
+      
+      if (strokeCount > 0) {
+        o = vec4(u_line_color.rgb, 1.0);
+      }
+    }
+
+      #if CC_USE_ALPHA_ATLAS_TEXTURE
+      o.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+      #endif
+    #endif
+
+    o *= v_color;
+
+    ALPHA_TEST(o);
+
+    gl_FragColor = o;
+  }
+}%

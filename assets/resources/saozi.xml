@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<!-- 连接属性配置 -->
+	<sessions>
+		<!-- 保留3600秒 -->
+		<session name="server-long">
+			<buffer_length value="32800"/>
+			<max_packet value="32768"/>
+			<!-- 简单测试,除gate外全部支持大数据包 -->
+			<allow_big value="true"/> 
+			<retain_timeout value="3600"/>
+		</session>
+		
+		<!-- 保留10秒 -->
+		<session name="server-short">
+			<retain_timeout value="10"/>
+			<!-- 接入服务器监听加密 -->
+			<encrypt value="true"/>
+		</session>
+
+		<!-- 无限重试连接 -->
+		<session name="client-always">
+			<buffer_length value="32800"/>
+			<max_packet value="32768"/>
+			<max_retry value="0"/>
+			<!-- 简单测试,除gate外全部支持大数据包 -->
+			<allow_big value="true"/> 
+		</session>
+	</sessions>
+</root>
