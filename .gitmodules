@@ -1,0 +1,4 @@
+[submodule "assets/script/framework"]
+	path = assets/script/framework
+	url = https://github.com/Kaka9994/ccc-framework.git
+	branch = master
