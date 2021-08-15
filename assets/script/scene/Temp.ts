@@ -58,15 +58,4 @@ export default class Temp extends cc.Component {
         this._loadmgr && this._loadmgr.render(this._rendertime, dtms)
         this._soundmgr && this._soundmgr.render(this._rendertime, dtms)
     }
-    
-    public getPolygonsByLight(light: cc.Vec2) { 
-        let r = cc.rect(light.x - this.radius / 2, light.y - this.radius / 2, this.radius, this.radius); 
-        let eles = this.quadTree.retrieve(r); 
-        let polygon: cc.Vec2[][] = []; 
-        for (const e of eles) { 
-            polygon.push(this.polygons[e.id].points); 
-        } 
-        console.log(eles.length) 
-        return polygon; 
-    }
 }
