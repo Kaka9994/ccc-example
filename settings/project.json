@@ -1,8 +1,8 @@
 {
   "group-list": [
     "default",
-    "tmp",
-    "tmp2"
+    "ui1",
+    "ui2"
   ],
   "collision-matrix": [
     [
@@ -33,8 +33,8 @@
   "simulator-orientation": false,
   "use-customize-simulator": true,
   "simulator-resolution": {
-    "height": 640,
-    "width": 960
+    "width": 960,
+    "height": 640
   },
   "assets-sort-type": "name",
   "facebook": {
@@ -47,8 +47,9 @@
       "enable": false
     }
   },
-  "start-scene": "current",
   "migrate-history": [
     "cloud-function"
-  ]
+  ],
+  "preview-port": 7456,
+  "clear-simulator-cache": true
 }
